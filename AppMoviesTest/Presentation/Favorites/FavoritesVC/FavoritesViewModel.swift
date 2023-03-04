@@ -28,10 +28,8 @@ final class FavoritesViewModelImpl: FavoritesViewModel {
     
     // MARK: - LoginViewModelInput
     
-
     // MARK: - LoginViewModelOutput
 
-    
     // MARK: - Initialization
     
     init(routing: FavoritesViewModelRouting) {
@@ -44,4 +42,3 @@ final class FavoritesViewModelImpl: FavoritesViewModel {
     }
     
 }
-

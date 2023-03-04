@@ -1,4 +1,5 @@
 import UIKit
+import SnapKit
 
 final class FavoritesViewController: UIViewController {
     
@@ -19,8 +20,4 @@ final class FavoritesViewController: UIViewController {
     private func setupUI() {
         
     }
-
-
 }
-
-

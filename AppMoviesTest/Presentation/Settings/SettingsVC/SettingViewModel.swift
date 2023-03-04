@@ -28,10 +28,8 @@ final class SettingsViewModelImpl: SettingsViewModel {
     
     // MARK: - LoginViewModelInput
     
-
     // MARK: - LoginViewModelOutput
 
-    
     // MARK: - Initialization
     
     init(routing: SettingsViewModelRouting) {
@@ -42,7 +40,4 @@ final class SettingsViewModelImpl: SettingsViewModel {
     private func configureBindings() {
         
     }
-    
 }
-
-

@@ -19,7 +19,4 @@ final class MainViewController: UIViewController {
     private func setupUI() {
         
     }
-
-
 }
-

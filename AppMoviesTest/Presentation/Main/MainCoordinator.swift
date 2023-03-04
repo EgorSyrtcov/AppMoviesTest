@@ -34,10 +34,9 @@ final class MainCoordinator: Coordinator {
         let settingsNavController = UINavigationController(rootViewController: settingsViewController)
         settingsViewController.viewModel = settingsViewModel
         
-        [mainNavController, favoritesNavController, settingsNavController]
-            .forEach { $0.navigationBar.prefersLargeTitles = true;
-                       $0.navigationItem.largeTitleDisplayMode = .automatic
-            }
+        [mainNavController, favoritesNavController, settingsNavController].forEach { $0.navigationBar.prefersLargeTitles = true
+            $0.navigationItem.largeTitleDisplayMode = .automatic
+        }
         
         mainNavController.tabBarItem = UITabBarItem(title: "Main", image: UIImage(systemName: "mail.fill"), tag: 1)
         favoritesNavController.tabBarItem = UITabBarItem(title: "Favorites", image: UIImage(systemName: "filemenu.and.selection"), tag: 2)

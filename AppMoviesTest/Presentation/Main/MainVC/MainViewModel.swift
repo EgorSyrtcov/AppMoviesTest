@@ -28,10 +28,8 @@ final class MainViewModelImpl: MainViewModel {
     
     // MARK: - LoginViewModelInput
     
-
     // MARK: - LoginViewModelOutput
 
-    
     // MARK: - Initialization
     
     init(routing: MainViewModelRouting) {
