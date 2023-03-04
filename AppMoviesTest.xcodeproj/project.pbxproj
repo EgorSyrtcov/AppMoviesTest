@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E239965C29B384AA00787F1D /* MovieModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E239965B29B384AA00787F1D /* MovieModel.swift */; };
+		E239965E29B38DED00787F1D /* InteractiveHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E239965D29B38DED00787F1D /* InteractiveHeader.swift */; };
+		E274200C29B33C7B00D6697D /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E274200B29B33C7B00D6697D /* SnapKit */; };
+		E274201029B33D3F00D6697D /* UICollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E274200F29B33D3F00D6697D /* UICollectionView.swift */; };
+		E274201229B3475B00D6697D /* UICollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E274201129B3475B00D6697D /* UICollectionViewCell.swift */; };
+		E274201529B34AE200D6697D /* MovieViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E274201429B34AE200D6697D /* MovieViewCell.swift */; };
+		E274201829B34BEC00D6697D /* MovieCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E274201729B34BEC00D6697D /* MovieCardView.swift */; };
 		E27F511629B2A6B900AB292C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27F511529B2A6B900AB292C /* AppDelegate.swift */; };
 		E27F511829B2A6B900AB292C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27F511729B2A6B900AB292C /* SceneDelegate.swift */; };
 		E27F511A29B2A6B900AB292C /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27F511929B2A6B900AB292C /* MainViewController.swift */; };
@@ -24,6 +31,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E239965B29B384AA00787F1D /* MovieModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieModel.swift; sourceTree = "<group>"; };
+		E239965D29B38DED00787F1D /* InteractiveHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveHeader.swift; sourceTree = "<group>"; };
+		E274200F29B33D3F00D6697D /* UICollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICollectionView.swift; sourceTree = "<group>"; };
+		E274201129B3475B00D6697D /* UICollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICollectionViewCell.swift; sourceTree = "<group>"; };
+		E274201429B34AE200D6697D /* MovieViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieViewCell.swift; sourceTree = "<group>"; };
+		E274201729B34BEC00D6697D /* MovieCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCardView.swift; sourceTree = "<group>"; };
 		E27F511229B2A6B900AB292C /* AppMoviesTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppMoviesTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E27F511529B2A6B900AB292C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E27F511729B2A6B900AB292C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -47,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E274200C29B33C7B00D6697D /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,6 +72,23 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E274201329B34A9600D6697D /* MovieViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				E274201429B34AE200D6697D /* MovieViewCell.swift */,
+			);
+			path = MovieViewCell;
+			sourceTree = "<group>";
+		};
+		E274201629B34BCC00D6697D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E239965D29B38DED00787F1D /* InteractiveHeader.swift */,
+				E274201729B34BEC00D6697D /* MovieCardView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		E27F510929B2A6B900AB292C = {
@@ -123,6 +154,7 @@
 		E27F512D29B2A7D700AB292C /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E239965B29B384AA00787F1D /* MovieModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -137,6 +169,8 @@
 		E27F512F29B2A7EF00AB292C /* Extention */ = {
 			isa = PBXGroup;
 			children = (
+				E274200F29B33D3F00D6697D /* UICollectionView.swift */,
+				E274201129B3475B00D6697D /* UICollectionViewCell.swift */,
 				E27F513B29B2AA7500AB292C /* UIView.swift */,
 			);
 			path = Extention;
@@ -179,6 +213,8 @@
 		E27F513A29B2A9EE00AB292C /* MainVC */ = {
 			isa = PBXGroup;
 			children = (
+				E274201629B34BCC00D6697D /* Views */,
+				E274201329B34A9600D6697D /* MovieViewCell */,
 				E27F513D29B2AA9600AB292C /* MainViewModel.swift */,
 				E27F511929B2A6B900AB292C /* MainViewController.swift */,
 			);
@@ -210,10 +246,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E27F512629B2A6BB00AB292C /* Build configuration list for PBXNativeTarget "AppMoviesTest" */;
 			buildPhases = (
+				E274200729B331CA00D6697D /* SwiftLint */,
 				E27F510E29B2A6B900AB292C /* Sources */,
 				E27F510F29B2A6B900AB292C /* Frameworks */,
 				E27F511029B2A6B900AB292C /* Resources */,
-				E274200729B331CA00D6697D /* SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -221,6 +257,7 @@
 			);
 			name = AppMoviesTest;
 			packageProductDependencies = (
+				E274200B29B33C7B00D6697D /* SnapKit */,
 			);
 			productName = AppMoviesTest;
 			productReference = E27F511229B2A6B900AB292C /* AppMoviesTest.app */;
@@ -292,7 +329,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test -d \"/opt/homebrew/bin\"; then\n    PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nexport PATH\n\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -303,16 +340,22 @@
 			files = (
 				E27F513529B2A8A300AB292C /* Coordinator.swift in Sources */,
 				E27F511A29B2A6B900AB292C /* MainViewController.swift in Sources */,
+				E274201529B34AE200D6697D /* MovieViewCell.swift in Sources */,
+				E274201829B34BEC00D6697D /* MovieCardView.swift in Sources */,
 				E27F513729B2A8E800AB292C /* AppCoordinator.swift in Sources */,
 				E27F514129B2ABBD00AB292C /* FavoritesViewModel.swift in Sources */,
+				E239965C29B384AA00787F1D /* MovieModel.swift in Sources */,
 				E27F513C29B2AA7500AB292C /* UIView.swift in Sources */,
+				E274201229B3475B00D6697D /* UICollectionViewCell.swift in Sources */,
 				E27F513E29B2AA9600AB292C /* MainViewModel.swift in Sources */,
 				E27F511629B2A6B900AB292C /* AppDelegate.swift in Sources */,
+				E239965E29B38DED00787F1D /* InteractiveHeader.swift in Sources */,
 				E27F511829B2A6B900AB292C /* SceneDelegate.swift in Sources */,
 				E27F514629B2ACB400AB292C /* SettingViewModel.swift in Sources */,
 				E27F514329B2AC1900AB292C /* FavoritesViewController.swift in Sources */,
 				E27F513929B2A97C00AB292C /* MainCoordinator.swift in Sources */,
 				E27F514829B2AD0F00AB292C /* SettingsViewController.swift in Sources */,
+				E274201029B33D3F00D6697D /* UICollectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -541,6 +584,14 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E274200B29B33C7B00D6697D /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E274200629B3310700D6697D /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E27F510A29B2A6B900AB292C /* Project object */;
 }
