@@ -3,13 +3,13 @@ import Combine
 
 final class MainViewController: UIViewController {
     
-    lazy var activityIndicator: UIActivityIndicatorView = {
+    lazy private var activityIndicator: UIActivityIndicatorView = {
         var activityIndicator = UIActivityIndicatorView(style: .large)
         activityIndicator.hidesWhenStopped = true
         return activityIndicator
     }()
     
-    lazy var collectionView: UICollectionView = {
+    lazy private var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 15, left: 20, bottom: 20, right: 20)
         layout.itemSize = CGSize(width: self.view.frame.width - 80, height: 400)
@@ -20,7 +20,15 @@ final class MainViewController: UIViewController {
         collection.register(InteractiveHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: InteractiveHeader.identifier)
         collection.dataSource = self
         collection.delegate = self
+        collection.alwaysBounceVertical = true
+        collection.refreshControl = refreshControl
         return collection
+    }()
+    
+    lazy private var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(didPullToRefresh(_:)), for: .valueChanged)
+        return refreshControl
     }()
     
     // MARK: Public
@@ -71,29 +79,19 @@ final class MainViewController: UIViewController {
             }
             .store(in: &cancellables)
         
+        viewModel.updateUncomingMoviesPublisher
+            .sink { [weak self] returnValue in
+                guard let self = self else { return }
+                self.upcomingMovies = returnValue
+                self.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
+        
         viewModel.errorPublisher
             .sink { [weak self] error in
                 guard let self = self else { return }
                 self.showAlert(title: error.title, subtitle: error.subtitle) }
             .store(in: &cancellables)
-    }
-    
-    func update(isShown: Bool) {
-        if isShown {
-            activityIndicator.startAnimating()
-        }
-        else {
-            activityIndicator.stopAnimating()
-        }
-    }
-    
-    func showAlert(title: String?, subtitle: String?, completion: (() -> Void)? = nil) {
-        if title == nil {
-            return
-        }
-        let alert = UIAlertController(title: title, message: subtitle, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in completion?() }))
-        present(alert, animated: true)
     }
     
     private func setupUI() {
@@ -122,6 +120,13 @@ final class MainViewController: UIViewController {
         }))
         alertController.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: nil))
         present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc private func didPullToRefresh(_ sender: Any) {
+        
+        print("!!!!")
+        
+        refreshControl.endRefreshing()
     }
 }
 
@@ -167,11 +172,39 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
             header?.setUp(title: self.section.rawValue)
             return header ?? UICollectionReusableView()
         }
-    
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.size.width, height: 30.0)
     }
-    
 }
+
+extension MainViewController {
+    
+    // Action viewModelBinding
+    private func update(isShown: Bool) {
+        
+        DispatchQueue.main.async {
+            if isShown {
+                self.activityIndicator.startAnimating()
+            }
+            else {
+                self.activityIndicator.stopAnimating()
+            }
+        }
+    }
+    
+    private func showAlert(title: String?, subtitle: String?, completion: (() -> Void)? = nil) {
+        if title == nil {
+            return
+        }
+        
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: title, message: subtitle, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in completion?() }))
+            self.present(alert, animated: true)
+        }
+    }
+}
+

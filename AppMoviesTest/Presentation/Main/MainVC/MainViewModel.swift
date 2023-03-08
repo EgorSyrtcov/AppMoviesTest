@@ -17,6 +17,7 @@ protocol MainViewModelInput {
 protocol MainViewModelOutput {
     var updateCategoryPublisher: AnyPublisher<Section, Never> { get }
     var updatePopularMoviesPublisher: AnyPublisher<[Movie], Never> { get }
+    var updateUncomingMoviesPublisher: AnyPublisher<[Movie], Never> { get }
     var isLoadingPublisher: AnyPublisher<Bool, Never> { get }
     var errorPublisher: AnyPublisher<(title: String?, subtitle: String?), Never> { get }
 }
@@ -64,6 +65,14 @@ final class MainViewModelImpl: MainViewModel {
             .eraseToAnyPublisher()
     }
     
+    var updateUncomingMoviesPublisher: AnyPublisher<[Movie], Never> {
+        upcomingMoviesSubject
+            .map { movies in
+                movies.map { self.genreMovie(movie: $0)}
+            }
+            .eraseToAnyPublisher()
+    }
+    
     var errorPublisher: AnyPublisher<(title: String?, subtitle: String?), Never> {
         errorSubject.eraseToAnyPublisher()
     }
@@ -82,7 +91,12 @@ final class MainViewModelImpl: MainViewModel {
     private func configureBindings() {
         filterButtonDidTapSubject
             .sink { [weak self] sectionType in
-                self?.sectionSubject.send(sectionType)
+                guard let self = self else { return }
+                self.sectionSubject.send(sectionType)
+                
+                Task {
+                    try? await self.requestUncomingMovies()
+                }
             }
             .store(in: &cancellables)
     }
@@ -126,6 +140,27 @@ final class MainViewModelImpl: MainViewModel {
         })).joined(separator: ", ")
         
         return Movie(adult: movie.adult, backdropPath: movie.backdropPath, genreIDS: movie.genreIDS, id: movie.id, originalTitle: movie.originalTitle, overview: movie.overview, popularity: movie.popularity, posterPath: movie.posterPath, releaseDate: movie.releaseDate, title: movie.title, video: movie.video, voteAverage: movie.voteAverage, voteCount: movie.voteCount, genre: genresName)
+    }
+    
+    private func requestUncomingMovies() async throws {
+        
+        isLoadingSubject.send(true)
+
+        let upcomingMovie: MovieModel?
+
+        do {
+            upcomingMovie = try await service.execute(.getUpcomingMovieRequest(pageNumber: 2), expecting: MovieModel.self)
+        }
+        catch {
+            isLoadingSubject.send(false)
+            errorSubject.send((title: error.localizedDescription, subtitle: "Try again"))
+            return
+        }
+
+        await MainActor.run { [weak self] in
+            self?.upcomingMoviesSubject.send(upcomingMovie?.movies ?? [])
+            isLoadingSubject.send(false)
+        }
     }
     
 }
