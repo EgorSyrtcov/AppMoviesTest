@@ -6,6 +6,7 @@ final class MainViewController: UIViewController {
     lazy private var activityIndicator: UIActivityIndicatorView = {
         var activityIndicator = UIActivityIndicatorView(style: .large)
         activityIndicator.hidesWhenStopped = true
+        activityIndicator.color = .white
         return activityIndicator
     }()
     
@@ -18,6 +19,7 @@ final class MainViewController: UIViewController {
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.register(MovieViewCell<MovieCardView>.self)
         collection.register(InteractiveHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: InteractiveHeader.identifier)
+        collection.showsVerticalScrollIndicator = false
         collection.dataSource = self
         collection.delegate = self
         collection.alwaysBounceVertical = true
@@ -38,6 +40,7 @@ final class MainViewController: UIViewController {
     private var popularMovies = [Movie]()
     private var upcomingMovies = [Movie]()
     private var section: Section = .popular
+    private var isLoadingMore = false
     
     private var cancellables: Set<AnyCancellable> = []
     
@@ -74,7 +77,8 @@ final class MainViewController: UIViewController {
         viewModel.updatePopularMoviesPublisher
             .sink { [weak self] returnValue in
                 guard let self = self else { return }
-                self.popularMovies = returnValue
+                self.popularMovies.append(contentsOf: returnValue)
+                self.isLoadingMore = false
                 self.collectionView.reloadData()
             }
             .store(in: &cancellables)
@@ -82,7 +86,8 @@ final class MainViewController: UIViewController {
         viewModel.updateUncomingMoviesPublisher
             .sink { [weak self] returnValue in
                 guard let self = self else { return }
-                self.upcomingMovies = returnValue
+                self.upcomingMovies.append(contentsOf: returnValue)
+                self.isLoadingMore = false
                 self.collectionView.reloadData()
             }
             .store(in: &cancellables)
@@ -123,9 +128,7 @@ final class MainViewController: UIViewController {
     }
     
     @objc private func didPullToRefresh(_ sender: Any) {
-        
-        print("!!!!")
-        
+        viewModel.didPullToRefreshSubject.send()
         refreshControl.endRefreshing()
     }
 }
@@ -180,6 +183,23 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
     }
 }
 
+extension MainViewController: UIScrollViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        guard !isLoadingMore else { return }
+        
+        let offset = scrollView.contentOffset.y
+        let totalContentHeight = scrollView.contentSize.height
+        let totalScrollViewFixedHeight = scrollView.frame.size.height
+        
+        if offset > (totalContentHeight - totalScrollViewFixedHeight) {
+            isLoadingMore = true
+            viewModel.scrollLoadingMoreSubject.send()
+        }
+    }
+}
+
 extension MainViewController {
     
     // Action viewModelBinding
@@ -207,4 +227,3 @@ extension MainViewController {
         }
     }
 }
-

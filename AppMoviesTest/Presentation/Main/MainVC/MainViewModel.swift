@@ -12,6 +12,8 @@ struct MainViewModelRouting {
 
 protocol MainViewModelInput {
     var filterButtonDidTapSubject: PassthroughSubject<Section, Never> { get }
+    var didPullToRefreshSubject: PassthroughSubject<Void, Never> { get }
+    var scrollLoadingMoreSubject: PassthroughSubject<Void, Never> { get }
 }
 
 protocol MainViewModelOutput {
@@ -34,16 +36,22 @@ final class MainViewModelImpl: MainViewModel {
     
     // MARK: - Private Subjects
     
-    private let sectionSubject = PassthroughSubject<Section, Never>()
-    private let popularMoviesSubject = PassthroughSubject<[Movie], Never>()
+    private let sectionSubject = CurrentValueSubject<Section, Never>(.popular)
+    private let popularMoviesSubject = CurrentValueSubject<[Movie], Never>([])
     private let upcomingMoviesSubject = PassthroughSubject<[Movie], Never>()
     private let errorSubject = CurrentValueSubject<(title: String?, subtitle: String?), Never>((title: nil, subtitle: nil))
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private var genres = [Genre]()
+    private var maxPopularPage = 1
+    private var maxUpcominPage = 1
+    private var currentPopularPage = 1
+    private var currentUpcomingPage = 1
     
     // MARK: - LoginViewModelInput
     
     var filterButtonDidTapSubject = PassthroughSubject<Section, Never>()
+    var didPullToRefreshSubject = PassthroughSubject<Void, Never>()
+    var scrollLoadingMoreSubject = PassthroughSubject<Void, Never>()
     
     // MARK: - LoginViewModelOutput
     
@@ -84,7 +92,7 @@ final class MainViewModelImpl: MainViewModel {
         configureBindings()
         
         Task {
-            try? await requestMovies()
+            try? await requestMovies(page: currentPopularPage)
         }
     }
     
@@ -99,9 +107,54 @@ final class MainViewModelImpl: MainViewModel {
                 }
             }
             .store(in: &cancellables)
+        
+        didPullToRefreshSubject
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                
+                switch self.sectionSubject.value {
+                case .popular:
+                    self.currentPopularPage = 1
+                    self.popularMoviesSubject.send([])
+                    Task {
+                        try? await self.requestMovies(page: self.currentPopularPage)
+                    }
+                case .upcoming:
+                    Task {
+                        self.currentUpcomingPage = 1
+                        self.upcomingMoviesSubject.send([])
+                        try? await self.requestUncomingMovies()
+                    }
+                }
+            }
+            .store(in: &cancellables)
+        
+        scrollLoadingMoreSubject
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                
+                switch self.sectionSubject.value {
+                case .popular:
+                    
+                    guard self.currentPopularPage >= self.maxPopularPage else { return }
+                    self.currentPopularPage+=1
+
+                    Task {
+                        try? await self.requestMovies(page: self.currentPopularPage)
+                    }
+                case .upcoming:
+                    guard self.currentUpcomingPage >= self.maxUpcominPage else { return }
+                    self.currentUpcomingPage+=1
+                    Task {
+                        try? await self.requestUncomingMovies()
+                    }
+                }
+                
+            }
+            .store(in: &cancellables)
     }
     
-    private func requestMovies() async throws {
+    private func requestMovies(page: Int) async throws {
         
         isLoadingSubject.send(true)
 
@@ -118,7 +171,7 @@ final class MainViewModelImpl: MainViewModel {
         }
 
         do {
-            movie = try await service.execute(.getPopularMovieRequest(pageNumber: 1), expecting: MovieModel.self)
+            movie = try await service.execute(.getPopularMovieRequest(pageNumber: page), expecting: MovieModel.self)
         }
         catch {
             isLoadingSubject.send(false)
@@ -127,6 +180,7 @@ final class MainViewModelImpl: MainViewModel {
         }
 
         await MainActor.run { [weak self] in
+            self?.maxPopularPage = movie?.page ?? 1
             self?.genres = genre?.genres.compactMap { $0 } ?? []
             self?.popularMoviesSubject.send(movie?.movies ?? [])
             isLoadingSubject.send(false)
@@ -158,6 +212,7 @@ final class MainViewModelImpl: MainViewModel {
         }
 
         await MainActor.run { [weak self] in
+            self?.maxUpcominPage = upcomingMovie?.page ?? 1
             self?.upcomingMoviesSubject.send(upcomingMovie?.movies ?? [])
             isLoadingSubject.send(false)
         }
