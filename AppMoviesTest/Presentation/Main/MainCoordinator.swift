@@ -38,7 +38,7 @@ final class MainCoordinator: Coordinator {
             $0.navigationItem.largeTitleDisplayMode = .automatic
         }
         
-        mainNavController.tabBarItem = UITabBarItem(title: "Main", image: UIImage(systemName: "mail.fill"), tag: 1)
+        mainNavController.tabBarItem = UITabBarItem(title: "Movies", image: UIImage(systemName: "mail.fill"), tag: 1)
         favoritesNavController.tabBarItem = UITabBarItem(title: "Favorites", image: UIImage(systemName: "filemenu.and.selection"), tag: 2)
         settingsNavController.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gear"), tag: 3)
 

@@ -1,13 +1,18 @@
 import UIKit
-import SnapKit
 import Combine
 
 final class MainViewController: UIViewController {
     
+    lazy var activityIndicator: UIActivityIndicatorView = {
+        var activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.hidesWhenStopped = true
+        return activityIndicator
+    }()
+    
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 15, left: 20, bottom: 20, right: 20)
-        layout.itemSize = CGSize(width: self.view.frame.width - 40, height: 300)
+        layout.itemSize = CGSize(width: self.view.frame.width - 80, height: 400)
         layout.minimumLineSpacing = 30
         layout.scrollDirection = .vertical
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -37,7 +42,7 @@ final class MainViewController: UIViewController {
     }
     
     private func setup() {
-        title = "Main"
+        title = "Movies"
         view.backgroundColor = .white
     }
     
@@ -46,6 +51,10 @@ final class MainViewController: UIViewController {
     }
     
     private func viewModelBinding() {
+        viewModel.isLoadingPublisher
+            .sink { [weak self] in self?.update(isShown: $0) }
+            .store(in: &cancellables)
+        
         viewModel.updateCategoryPublisher
             .sink { [weak self] returnValue in
                 guard let self = self else { return }
@@ -53,13 +62,50 @@ final class MainViewController: UIViewController {
                 self.collectionView.reloadData()
             }
             .store(in: &cancellables)
+        
+        viewModel.updatePopularMoviesPublisher
+            .sink { [weak self] returnValue in
+                guard let self = self else { return }
+                self.popularMovies = returnValue
+                self.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
+        
+        viewModel.errorPublisher
+            .sink { [weak self] error in
+                guard let self = self else { return }
+                self.showAlert(title: error.title, subtitle: error.subtitle) }
+            .store(in: &cancellables)
+    }
+    
+    func update(isShown: Bool) {
+        if isShown {
+            activityIndicator.startAnimating()
+        }
+        else {
+            activityIndicator.stopAnimating()
+        }
+    }
+    
+    func showAlert(title: String?, subtitle: String?, completion: (() -> Void)? = nil) {
+        if title == nil {
+            return
+        }
+        let alert = UIAlertController(title: title, message: subtitle, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in completion?() }))
+        present(alert, animated: true)
     }
     
     private func setupUI() {
-        view.addSubview(collectionView)
+        view.addSubviews(collectionView, activityIndicator)
         
         collectionView.snp.makeConstraints { make in
             make.edges.equalTo(view)
+        }
+        
+        activityIndicator.snp.makeConstraints { make in
+            make.center.equalTo(collectionView.snp.center)
+            make.size.equalTo(CGSize(width: 50, height: 50))
         }
     }
     

@@ -15,27 +15,24 @@ final class MovieCardView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.numberOfLines = 0
-        label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 30)
+        label.textColor = .white
+        label.font = UIFont.boldSystemFont(ofSize: 20)
         return label
     }()
     
     private let yearLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .right
-        label.textColor = .black
-        label.text = "Год: 2009"
-        label.font = UIFont.systemFont(ofSize: 20)
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 10)
         return label
     }()
     
     private let genreLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
-        label.textColor = .black
-        label.text = "Жанр: Экспериментальное кино"
-        label.font = UIFont.systemFont(ofSize: 20)
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 10)
         return label
     }()
     
@@ -58,10 +55,11 @@ final class MovieCardView: UIView {
     
     func update(with movie: Movie) {
         titleLabel.text = movie.originalTitle
-        yearLabel.text = "Год выхода: \(movie.releaseDate)"
-        genreLabel.text = "Жанр: \(movie.genreIDS)"
+        yearLabel.text = movie.releaseDate
+        genreLabel.text = "Жанр: \(movie.genre)"
+        posterImageView.downloaded(from: movie.poster)
     }
-    
+
     private func setup() {
         self.backgroundColor = .lightGray
         self.setShadow()
@@ -85,13 +83,12 @@ final class MovieCardView: UIView {
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(posterImageView.snp.top).offset(10)
-            make.right.equalTo(posterImageView.snp.right).offset(-10)
+            make.right.equalTo(likeButton.snp.left).offset(-10)
             make.left.equalTo(posterImageView.snp.left).offset(10)
-            make.bottom.equalTo(genreLabel.snp.top).offset(-20)
         }
         
         genreLabel.snp.makeConstraints { make in
-            make.bottom.equalTo(self.snp.bottom).offset(-30)
+            make.bottom.equalTo(self.snp.bottom).offset(-10)
             make.left.equalTo(self.snp.left).offset(10).priority(.high)
             make.height.equalTo(30)
         }
