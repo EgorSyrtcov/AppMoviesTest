@@ -11,6 +11,7 @@ protocol DetailViewModelInput {
 
 protocol DetailViewModelOutput {
     var movieDataPublisher: AnyPublisher<Movie?, Never> { get }
+    var showAlertSaveRealmBasePublisher: AnyPublisher<Void, Never> { get }
 }
 
 typealias DetailViewModel = DetailViewModelInput & DetailViewModelOutput
@@ -20,11 +21,13 @@ final class DetailViewModelImpl: DetailViewModel {
     // MARK: - Private Properties
     
     private var routing: DetailViewModelRouting
+    private let realmService = RealmService()
     private var cancellables: Set<AnyCancellable> = []
     private var movie: Movie
     
     // MARK: - Private Subjects
     private let movieDataSubject = CurrentValueSubject<Movie?, Never>(nil)
+    private let alertSaveToRealmSubject = PassthroughSubject<Void, Never>()
     
     // MARK: - LoginViewModelInput
     
@@ -33,6 +36,10 @@ final class DetailViewModelImpl: DetailViewModel {
     // MARK: - DetailViewModelOutput
     var movieDataPublisher: AnyPublisher<Movie?, Never> {
         movieDataSubject.eraseToAnyPublisher()
+    }
+    
+    var showAlertSaveRealmBasePublisher: AnyPublisher<Void, Never> {
+        alertSaveToRealmSubject.eraseToAnyPublisher()
     }
 
     // MARK: - Initialization
@@ -45,6 +52,14 @@ final class DetailViewModelImpl: DetailViewModel {
     }
     
     private func configureBindings() {
-        
+        didTapLikeSubject
+            .sink { [weak self] in
+                guard let movie = self?.movieDataSubject.value else { return }
+            
+                let movieRealmModel = MovieRealmModel(from: movie)
+                self?.realmService.save(movie: movieRealmModel)
+                self?.alertSaveToRealmSubject.send()
+            }
+            .store(in: &cancellables)
     }
 }

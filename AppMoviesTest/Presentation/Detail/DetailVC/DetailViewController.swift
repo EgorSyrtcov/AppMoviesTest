@@ -78,7 +78,6 @@ final class DetailViewController: UIViewController {
         let button = UIButton()
         button.setImage(UIImage(systemName: "heart"), for: .normal)
         button.layer.cornerRadius = 5
-        button.backgroundColor = .red
         button.addTarget(self, action: #selector(didTapButtonAction), for: .touchUpInside)
         return button
     }()
@@ -109,6 +108,13 @@ final class DetailViewController: UIViewController {
                 self.movieModel = movie
             }
             .store(in: &cancellables)
+        
+        viewModel.showAlertSaveRealmBasePublisher
+            .sink { [weak self] _ in
+                self?.showAlert()
+            }
+            .store(in: &cancellables)
+        
     }
     
     private func settingsModel() {
@@ -194,5 +200,11 @@ final class DetailViewController: UIViewController {
     // MARK: Actions
     @objc func didTapButtonAction(sender: UIButton!) {
         viewModel.didTapLikeSubject.send()
+    }
+    
+    private func showAlert() {
+        let alertController = UIAlertController(title: "Great!", message: "Your movie has been added to favorites", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        present(alertController, animated: true, completion: nil)
     }
 }
