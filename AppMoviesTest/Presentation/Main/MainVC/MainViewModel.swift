@@ -7,7 +7,7 @@ enum Section: String {
 }
 
 struct MainViewModelRouting {
-    
+    let detailDidTapSubject = PassthroughSubject<Movie, Never>()
 }
 
 protocol MainViewModelInput {
@@ -15,6 +15,7 @@ protocol MainViewModelInput {
     var didPullToRefreshSubject: PassthroughSubject<Void, Never> { get }
     var scrollLoadingMoreSubject: PassthroughSubject<Void, Never> { get }
     var searchTextSubject: PassthroughSubject<String?, Never> { get set }
+    var detailCellDidTapSubject: PassthroughSubject<Movie, Never> { get set }
 }
 
 protocol MainViewModelOutput {
@@ -57,6 +58,7 @@ final class MainViewModelImpl: MainViewModel {
     var didPullToRefreshSubject = PassthroughSubject<Void, Never>()
     var scrollLoadingMoreSubject = PassthroughSubject<Void, Never>()
     var searchTextSubject = PassthroughSubject<String?, Never>()
+    var detailCellDidTapSubject = PassthroughSubject<Movie, Never>()
     
     // MARK: - LoginViewModelOutput
     
@@ -208,6 +210,14 @@ final class MainViewModelImpl: MainViewModel {
                 
             }
             .store(in: &cancellables)
+        
+        detailCellDidTapSubject
+            .sink { [weak self] movie in
+                guard let self = self else { return }
+                self.routing.detailDidTapSubject.send(movie)
+            }
+            .store(in: &cancellables)
+        
     }
     
     private func requestMovies(page: Int) async throws {

@@ -214,11 +214,21 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
             header?.setUp(title: self.section.rawValue)
             return header ?? UICollectionReusableView()
         }
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.size.width, height: 30.0)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        switch self.section {
+        case .popular:
+            let movie = popularMovies[indexPath.item]
+            viewModel.detailCellDidTapSubject.send(movie)
+        case .upcoming:
+            let movie = upcomingMovies[indexPath.item]
+            viewModel.detailCellDidTapSubject.send(movie)
+        }
     }
 }
 
