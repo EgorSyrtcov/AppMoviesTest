@@ -1,17 +1,11 @@
 import UIKit
 import Combine
 
-struct SettingsViewModelRouting {
-   
-}
+struct SettingsViewModelRouting {}
 
-protocol SettingsViewModelInput {
-   
-}
+protocol SettingsViewModelInput {}
 
-protocol SettingsViewModelOutput {
-   
-}
+protocol SettingsViewModelOutput {}
 
 typealias SettingsViewModel = SettingsViewModelInput & SettingsViewModelOutput
 
@@ -21,15 +15,7 @@ final class SettingsViewModelImpl: SettingsViewModel {
     
     private var routing: SettingsViewModelRouting
     private var cancellables: Set<AnyCancellable> = []
-    
-    // MARK: - Private Subjects
-    
-    private let errorSubject = PassthroughSubject<(title: String?, subtitle: String?), Never>()
-    
-    // MARK: - LoginViewModelInput
-    
-    // MARK: - LoginViewModelOutput
-
+  
     // MARK: - Initialization
     
     init(routing: SettingsViewModelRouting) {
