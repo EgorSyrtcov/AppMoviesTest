@@ -1,5 +1,6 @@
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class MovieCardView: UIView {
     
@@ -57,7 +58,13 @@ final class MovieCardView: UIView {
         titleLabel.text = movie.originalTitle
         yearLabel.text = movie.releaseDate
         genreLabel.text = "Жанр: \(movie.genre)"
-        posterImageView.downloaded(from: movie.poster)
+
+        KF.url(URL(string: movie.poster))
+          .placeholder(UIImage(named: "posterDefault"))
+          .loadDiskFileSynchronously()
+          .cacheMemoryOnly()
+          .fade(duration: 0.25)
+          .set(to: posterImageView)
     }
 
     private func setup() {

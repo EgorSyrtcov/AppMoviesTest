@@ -70,7 +70,7 @@ extension FavoritesViewController: UITableViewDelegate, UITableViewDataSource {
         let movie = movies[indexPath.row]
         cell.textLabel?.font = UIFont.systemFont(ofSize: 20.0)
         cell.backgroundColor = .lightGray
-        cell.textLabel?.text = "\(indexPath.row). \(movie.title)"
+        cell.textLabel?.text = movie.title
         return cell
     }
 }

@@ -1,6 +1,7 @@
 import UIKit
 import Combine
 import SnapKit
+import Kingfisher
 
 final class DetailViewController: UIViewController {
     
@@ -119,12 +120,18 @@ final class DetailViewController: UIViewController {
     
     private func settingsModel() {
         guard let movie = movieModel else { return }
-        posterImageView.downloaded(from: movie.poster)
         titleLabel.text = movie.title
         originalTitleLabel.text = movie.originalTitle
         descriptionMovieLabel.text = movie.overview
         genreLabel.text = "Жанры: \(movie.genre)"
         releaseDateLabel.text = "Release at \(movie.releaseDate)"
+        
+        KF.url(URL(string: movie.poster))
+          .placeholder(UIImage(named: "posterDefault"))
+          .loadDiskFileSynchronously()
+          .cacheMemoryOnly()
+          .fade(duration: 0.25)
+          .set(to: posterImageView)
     }
     
     private func setupUI() {
