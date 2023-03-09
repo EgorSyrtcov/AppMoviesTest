@@ -19,6 +19,8 @@
 		E25236DF29B9FAEC00DF2D86 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E25236DE29B9FAEC00DF2D86 /* RealmSwift */; };
 		E25236E229B9FD6E00DF2D86 /* MovieRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25236E129B9FD6E00DF2D86 /* MovieRealmModel.swift */; };
 		E25236E529B9FDD300DF2D86 /* RealmService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25236E429B9FDD300DF2D86 /* RealmService.swift */; };
+		E25236E729BA0AA800DF2D86 /* UITableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25236E629BA0AA800DF2D86 /* UITableView.swift */; };
+		E25236E929BA0AAE00DF2D86 /* UITableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25236E829BA0AAE00DF2D86 /* UITableViewCell.swift */; };
 		E266022829B5C8E800B8B3A2 /* GenreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E266022729B5C8E800B8B3A2 /* GenreModel.swift */; };
 		E274200C29B33C7B00D6697D /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E274200B29B33C7B00D6697D /* SnapKit */; };
 		E274201029B33D3F00D6697D /* UICollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E274200F29B33D3F00D6697D /* UICollectionView.swift */; };
@@ -52,6 +54,8 @@
 		E25236D929B9BCB900DF2D86 /* DetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewModel.swift; sourceTree = "<group>"; };
 		E25236E129B9FD6E00DF2D86 /* MovieRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieRealmModel.swift; sourceTree = "<group>"; };
 		E25236E429B9FDD300DF2D86 /* RealmService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmService.swift; sourceTree = "<group>"; };
+		E25236E629BA0AA800DF2D86 /* UITableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableView.swift; sourceTree = "<group>"; };
+		E25236E829BA0AAE00DF2D86 /* UITableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewCell.swift; sourceTree = "<group>"; };
 		E266022729B5C8E800B8B3A2 /* GenreModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreModel.swift; sourceTree = "<group>"; };
 		E274200F29B33D3F00D6697D /* UICollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICollectionView.swift; sourceTree = "<group>"; };
 		E274201129B3475B00D6697D /* UICollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICollectionViewCell.swift; sourceTree = "<group>"; };
@@ -231,6 +235,8 @@
 		E27F512F29B2A7EF00AB292C /* Extention */ = {
 			isa = PBXGroup;
 			children = (
+				E25236E629BA0AA800DF2D86 /* UITableView.swift */,
+				E25236E829BA0AAE00DF2D86 /* UITableViewCell.swift */,
 				E274200F29B33D3F00D6697D /* UICollectionView.swift */,
 				E274201129B3475B00D6697D /* UICollectionViewCell.swift */,
 				E27F513B29B2AA7500AB292C /* UIView.swift */,
@@ -417,6 +423,7 @@
 				E274201229B3475B00D6697D /* UICollectionViewCell.swift in Sources */,
 				E27F513E29B2AA9600AB292C /* MainViewModel.swift in Sources */,
 				E24423AD29B3E18600035F47 /* Service.swift in Sources */,
+				E25236E729BA0AA800DF2D86 /* UITableView.swift in Sources */,
 				E25236E529B9FDD300DF2D86 /* RealmService.swift in Sources */,
 				E25236DA29B9BCB900DF2D86 /* DetailViewModel.swift in Sources */,
 				E25236E229B9FD6E00DF2D86 /* MovieRealmModel.swift in Sources */,
@@ -428,6 +435,7 @@
 				E27F514629B2ACB400AB292C /* SettingViewModel.swift in Sources */,
 				E27F514329B2AC1900AB292C /* FavoritesViewController.swift in Sources */,
 				E27F513929B2A97C00AB292C /* MainCoordinator.swift in Sources */,
+				E25236E929BA0AAE00DF2D86 /* UITableViewCell.swift in Sources */,
 				E24423AF29B3E1C500035F47 /* Request.swift in Sources */,
 				E27F514829B2AD0F00AB292C /* SettingsViewController.swift in Sources */,
 				E274201029B33D3F00D6697D /* UICollectionView.swift in Sources */,

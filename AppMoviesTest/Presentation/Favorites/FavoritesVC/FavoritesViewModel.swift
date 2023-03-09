@@ -6,11 +6,11 @@ struct FavoritesViewModelRouting {
 }
 
 protocol FavoritesViewModelInput {
-   
+    var updateRealmModelsSubject: PassthroughSubject<Void, Never> { get }
 }
 
 protocol FavoritesViewModelOutput {
-   
+    var updateMoviesFromRealmPublisher: AnyPublisher<[MovieRealmModel], Never> { get }
 }
 
 typealias FavoritesViewModel = FavoritesViewModelInput & FavoritesViewModelOutput
@@ -19,17 +19,24 @@ final class FavoritesViewModelImpl: FavoritesViewModel {
     
     // MARK: - Private Properties
     
+    private let realmService = RealmService()
     private var routing: FavoritesViewModelRouting
     private var cancellables: Set<AnyCancellable> = []
     
     // MARK: - Private Subjects
     
-    private let errorSubject = PassthroughSubject<(title: String?, subtitle: String?), Never>()
+    var getMovieModelsRealmBaseSubject = PassthroughSubject<[MovieRealmModel], Never>()
     
-    // MARK: - LoginViewModelInput
+    // MARK: - FavoritesViewModelInput
     
-    // MARK: - LoginViewModelOutput
+    let updateRealmModelsSubject = PassthroughSubject<Void, Never>()
+    
+    // MARK: - FavoritesViewModelOutput
 
+    var updateMoviesFromRealmPublisher: AnyPublisher<[MovieRealmModel], Never> {
+        getMovieModelsRealmBaseSubject.eraseToAnyPublisher()
+    }
+    
     // MARK: - Initialization
     
     init(routing: FavoritesViewModelRouting) {
@@ -39,6 +46,12 @@ final class FavoritesViewModelImpl: FavoritesViewModel {
     
     private func configureBindings() {
         
+        updateRealmModelsSubject
+            .sink { [weak self] _ in
+                let movieModels = self?.realmService.getAllWords().toArray()
+                self?.getMovieModelsRealmBaseSubject.send(movieModels ?? [])
+            }
+            .store(in: &cancellables)
     }
     
 }
