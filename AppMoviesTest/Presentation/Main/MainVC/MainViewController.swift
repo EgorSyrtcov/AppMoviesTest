@@ -33,6 +33,15 @@ final class MainViewController: UIViewController {
         return refreshControl
     }()
     
+    private lazy var searchController: UISearchController = {
+        let sc = UISearchController(searchResultsController: nil)
+        sc.searchResultsUpdater = self
+        sc.searchBar.placeholder = "Search"
+        sc.searchBar.searchTextField.delegate = self
+        sc.searchBar.delegate = self
+        return sc
+    }()
+    
     // MARK: Public
     var viewModel: MainViewModel!
     
@@ -41,6 +50,7 @@ final class MainViewController: UIViewController {
     private var upcomingMovies = [Movie]()
     private var section: Section = .popular
     private var isLoadingMore = false
+    private var isActiveRefreshControl = true
     
     private var cancellables: Set<AnyCancellable> = []
     
@@ -59,9 +69,11 @@ final class MainViewController: UIViewController {
     
     private func setupNavigationBarButton() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Filter", style: .done, target: self, action: #selector(categoryButtonTapped))
+        navigationItem.searchController = searchController
     }
     
     private func viewModelBinding() {
+        
         viewModel.isLoadingPublisher
             .sink { [weak self] in self?.update(isShown: $0) }
             .store(in: &cancellables)
@@ -70,25 +82,32 @@ final class MainViewController: UIViewController {
             .sink { [weak self] returnValue in
                 guard let self = self else { return }
                 self.section = returnValue
-                self.collectionView.reloadData()
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
             }
             .store(in: &cancellables)
         
         viewModel.updatePopularMoviesPublisher
             .sink { [weak self] returnValue in
                 guard let self = self else { return }
-                self.popularMovies.append(contentsOf: returnValue)
+                self.popularMovies = returnValue
                 self.isLoadingMore = false
-                self.collectionView.reloadData()
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
             }
             .store(in: &cancellables)
         
         viewModel.updateUncomingMoviesPublisher
             .sink { [weak self] returnValue in
                 guard let self = self else { return }
-                self.upcomingMovies.append(contentsOf: returnValue)
+                self.upcomingMovies = returnValue
                 self.isLoadingMore = false
-                self.collectionView.reloadData()
+                
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
             }
             .store(in: &cancellables)
         
@@ -96,6 +115,24 @@ final class MainViewController: UIViewController {
             .sink { [weak self] error in
                 guard let self = self else { return }
                 self.showAlert(title: error.title, subtitle: error.subtitle) }
+            .store(in: &cancellables)
+        
+        viewModel.searchMoviesPublisher
+            .sink { [weak self] returnValue in
+                        
+                switch self?.section {
+                case .popular:
+                    self?.popularMovies = returnValue
+                case .upcoming:
+                    self?.upcomingMovies = returnValue
+                default:
+                    break
+                }
+                
+                DispatchQueue.main.async {
+                    self?.collectionView.reloadData()
+                }
+            }
             .store(in: &cancellables)
     }
     
@@ -128,8 +165,10 @@ final class MainViewController: UIViewController {
     }
     
     @objc private func didPullToRefresh(_ sender: Any) {
-        viewModel.didPullToRefreshSubject.send()
         refreshControl.endRefreshing()
+        
+        guard isActiveRefreshControl else { return }
+        viewModel.didPullToRefreshSubject.send()
     }
 }
 
@@ -187,12 +226,13 @@ extension MainViewController: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
+        guard !searchController.isActive else { return }
         guard !isLoadingMore else { return }
-        
+
         let offset = scrollView.contentOffset.y
         let totalContentHeight = scrollView.contentSize.height
         let totalScrollViewFixedHeight = scrollView.frame.size.height
-        
+
         if offset > (totalContentHeight - totalScrollViewFixedHeight) {
             isLoadingMore = true
             viewModel.scrollLoadingMoreSubject.send()
@@ -226,4 +266,27 @@ extension MainViewController {
             self.present(alert, animated: true)
         }
     }
+}
+
+extension MainViewController: UISearchResultsUpdating, UISearchBarDelegate, UITextFieldDelegate {
+    func updateSearchResults(for searchController: UISearchController) {
+     
+        let searchText = (searchController.searchBar.text ?? "")
+        viewModel.searchTextSubject.send(searchText)
+    }
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        isActiveRefreshControl = false
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        let indexPath = IndexPath(row: 0, section: 0)
+        collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
+            //viewModel.searchTextSubject.send(nil)
+        isActiveRefreshControl = true
+    }
+    
+//    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+//        //viewModel.searchTextSubject.send(nil)
+//        return true
+//    }
 }
