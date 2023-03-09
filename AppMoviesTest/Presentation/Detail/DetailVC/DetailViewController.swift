@@ -111,8 +111,8 @@ final class DetailViewController: UIViewController {
             .store(in: &cancellables)
         
         viewModel.showAlertSaveRealmBasePublisher
-            .sink { [weak self] _ in
-                self?.showAlert()
+            .sink { [weak self] title, message in
+                self?.showAlert(title: title ?? "", message: message ?? "")
             }
             .store(in: &cancellables)
         
@@ -209,8 +209,8 @@ final class DetailViewController: UIViewController {
         viewModel.didTapLikeSubject.send()
     }
     
-    private func showAlert() {
-        let alertController = UIAlertController(title: "Great!", message: "Your movie has been added to favorites", preferredStyle: .alert)
+    private func showAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
         present(alertController, animated: true, completion: nil)
     }

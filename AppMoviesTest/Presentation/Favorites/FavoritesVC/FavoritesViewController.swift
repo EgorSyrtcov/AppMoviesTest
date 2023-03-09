@@ -5,11 +5,10 @@ final class FavoritesViewController: UIViewController {
     
     lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.registerClassForCell(UITableViewCell.self)
+        tableView.registerClassForCell(FavoritesCell.self)
         tableView.backgroundColor = .white
         tableView.dataSource = self
-        tableView.rowHeight = 40
-        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.rowHeight = 120
         return tableView
     }()
     
@@ -50,12 +49,9 @@ final class FavoritesViewController: UIViewController {
     private func setupUI() {
         view.addSubviews(tableView)
         
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
+        tableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
 }
 
@@ -66,11 +62,9 @@ extension FavoritesViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: UITableViewCell = tableView.dequeueReusableCell(for: indexPath)
+        let cell: FavoritesCell = tableView.dequeueReusableCell(for: indexPath)
         let movie = movies[indexPath.row]
-        cell.textLabel?.font = UIFont.systemFont(ofSize: 20.0)
-        cell.backgroundColor = .lightGray
-        cell.textLabel?.text = movie.title
+        cell.setupMovie(movie)
         return cell
     }
     

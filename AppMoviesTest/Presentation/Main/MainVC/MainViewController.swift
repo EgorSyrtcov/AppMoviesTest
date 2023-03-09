@@ -119,7 +119,7 @@ final class MainViewController: UIViewController {
         
         viewModel.searchMoviesPublisher
             .sink { [weak self] returnValue in
-                        
+                
                 switch self?.section {
                 case .popular:
                     self?.popularMovies = returnValue
@@ -238,11 +238,11 @@ extension MainViewController: UIScrollViewDelegate {
         
         guard !searchController.isActive else { return }
         guard !isLoadingMore else { return }
-
+        
         let offset = scrollView.contentOffset.y
         let totalContentHeight = scrollView.contentSize.height
         let totalScrollViewFixedHeight = scrollView.frame.size.height
-
+        
         if offset > (totalContentHeight - totalScrollViewFixedHeight) {
             isLoadingMore = true
             viewModel.scrollLoadingMoreSubject.send()
@@ -280,7 +280,7 @@ extension MainViewController {
 
 extension MainViewController: UISearchResultsUpdating, UISearchBarDelegate, UITextFieldDelegate {
     func updateSearchResults(for searchController: UISearchController) {
-     
+        
         let searchText = (searchController.searchBar.text ?? "")
         viewModel.searchTextSubject.send(searchText)
     }
@@ -291,12 +291,12 @@ extension MainViewController: UISearchResultsUpdating, UISearchBarDelegate, UITe
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         let indexPath = IndexPath(row: 0, section: 0)
         collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
-            //viewModel.searchTextSubject.send(nil)
+        viewModel.searchTextSubject.send(nil)
         isActiveRefreshControl = true
     }
     
-//    func textFieldShouldClear(_ textField: UITextField) -> Bool {
-//        //viewModel.searchTextSubject.send(nil)
-//        return true
-//    }
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        viewModel.searchTextSubject.send(nil)
+        return true
+    }
 }

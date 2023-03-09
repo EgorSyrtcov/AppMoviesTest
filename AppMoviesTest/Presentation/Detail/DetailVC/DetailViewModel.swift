@@ -11,7 +11,7 @@ protocol DetailViewModelInput {
 
 protocol DetailViewModelOutput {
     var movieDataPublisher: AnyPublisher<Movie?, Never> { get }
-    var showAlertSaveRealmBasePublisher: AnyPublisher<Void, Never> { get }
+    var showAlertSaveRealmBasePublisher: AnyPublisher<(title: String?, subtitle: String?), Never> { get }
 }
 
 typealias DetailViewModel = DetailViewModelInput & DetailViewModelOutput
@@ -27,7 +27,7 @@ final class DetailViewModelImpl: DetailViewModel {
     
     // MARK: - Private Subjects
     private let movieDataSubject = CurrentValueSubject<Movie?, Never>(nil)
-    private let alertSaveToRealmSubject = PassthroughSubject<Void, Never>()
+    private let alertSaveToRealmSubject = PassthroughSubject<(title: String?, subtitle: String?), Never>()
     
     // MARK: - LoginViewModelInput
     
@@ -38,7 +38,7 @@ final class DetailViewModelImpl: DetailViewModel {
         movieDataSubject.eraseToAnyPublisher()
     }
     
-    var showAlertSaveRealmBasePublisher: AnyPublisher<Void, Never> {
+    var showAlertSaveRealmBasePublisher: AnyPublisher<(title: String?, subtitle: String?), Never> {
         alertSaveToRealmSubject.eraseToAnyPublisher()
     }
 
@@ -55,10 +55,19 @@ final class DetailViewModelImpl: DetailViewModel {
         didTapLikeSubject
             .sink { [weak self] in
                 guard let movie = self?.movieDataSubject.value else { return }
-            
+
                 let movieRealmModel = MovieRealmModel(from: movie)
-                self?.realmService.save(movie: movieRealmModel)
-                self?.alertSaveToRealmSubject.send()
+                
+                // Check if the movie is already in the database
+                let isMovieAlreadySaved = self?.realmService.getAllWords().contains(where: { $0.id == movie.id }) ?? false
+                
+                // Save the movie only if it's not already in the database
+                if !isMovieAlreadySaved {
+                    self?.realmService.save(movie: movieRealmModel)
+                    self?.alertSaveToRealmSubject.send((title: "Great!", subtitle: "Your movie has been added to favorites"))
+                } else {
+                    self?.alertSaveToRealmSubject.send((title: "Error", subtitle: "Movie is already in the Favorites"))
+                }
             }
             .store(in: &cancellables)
     }
