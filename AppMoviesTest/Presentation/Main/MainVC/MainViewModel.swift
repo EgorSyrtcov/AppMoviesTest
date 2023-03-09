@@ -41,7 +41,7 @@ final class MainViewModelImpl: MainViewModel {
     
     private let sectionSubject = CurrentValueSubject<Section, Never>(.popular)
     private let popularMoviesSubject = CurrentValueSubject<[Movie], Never>([])
-    private let upcomingMoviesSubject = PassthroughSubject<[Movie], Never>()
+    private let upcomingMoviesSubject = CurrentValueSubject<[Movie], Never>([])
     private let errorSubject = CurrentValueSubject<(title: String?, subtitle: String?), Never>((title: nil, subtitle: nil))
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private var popularMoviesTemp = [Movie]()
@@ -89,50 +89,29 @@ final class MainViewModelImpl: MainViewModel {
     }
     
     var searchMoviesPublisher: AnyPublisher<[Movie], Never> {
-        
-        switch self.sectionSubject.value {
-        case .upcoming:
-            return searchTextSubject
-                .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
-                .removeDuplicates()
-                .flatMap { searchText -> AnyPublisher<[Movie], Never> in
-                    if let searchText = searchText, !searchText.isEmpty {
-                        return self.upcomingMoviesSubject
-                            .map { movies in
-                                return movies.filter { movie in
-                                    return movie.title.lowercased().contains(searchText.lowercased())
-                                }
-                            }
-                            .eraseToAnyPublisher()
-                    } else {
-                        return self.upcomingMoviesSubject
-                            .eraseToAnyPublisher()
-                    }
+        return searchTextSubject
+            .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
+            .removeDuplicates()
+            .map { searchText in
+                switch self.sectionSubject.value {
+                case .upcoming:
+                    return self.filterMovies(self.upcomingMoviesSubject.value, forSearchText: searchText)
+                case .popular:
+                    return self.filterMovies(self.popularMoviesSubject.value, forSearchText: searchText)
                 }
-                .eraseToAnyPublisher()
-            
-        case .popular:
-            return searchTextSubject
-                .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
-                .removeDuplicates()
-                .flatMap { searchText -> AnyPublisher<[Movie], Never> in
-                    if let searchText = searchText, !searchText.isEmpty {
-                        return self.popularMoviesSubject
-                            .map { movies in
-                                return movies.filter { movie in
-                                    return movie.title.lowercased().contains(searchText.lowercased())
-                                }
-                            }
-                            .eraseToAnyPublisher()
-                    } else {
-                        return self.popularMoviesSubject
-                            .eraseToAnyPublisher()
-                    }
-                }
-                .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
+    }
+
+    private func filterMovies(_ movies: [Movie], forSearchText searchText: String?) -> [Movie] {
+        guard let searchText = searchText, !searchText.isEmpty else {
+            return movies
+        }
+        return movies.filter { movie in
+            return movie.title.lowercased().contains(searchText.lowercased())
         }
     }
-    
+
     var errorPublisher: AnyPublisher<(title: String?, subtitle: String?), Never> {
         errorSubject.eraseToAnyPublisher()
     }
