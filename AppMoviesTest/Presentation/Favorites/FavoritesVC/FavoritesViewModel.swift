@@ -7,6 +7,7 @@ struct FavoritesViewModelRouting {
 
 protocol FavoritesViewModelInput {
     var updateRealmModelsSubject: PassthroughSubject<Void, Never> { get }
+    var deleteRealmModelSubject: PassthroughSubject<MovieRealmModel, Never> { get }
 }
 
 protocol FavoritesViewModelOutput {
@@ -30,6 +31,7 @@ final class FavoritesViewModelImpl: FavoritesViewModel {
     // MARK: - FavoritesViewModelInput
     
     let updateRealmModelsSubject = PassthroughSubject<Void, Never>()
+    let deleteRealmModelSubject = PassthroughSubject<MovieRealmModel, Never>()
     
     // MARK: - FavoritesViewModelOutput
 
@@ -48,6 +50,14 @@ final class FavoritesViewModelImpl: FavoritesViewModel {
         
         updateRealmModelsSubject
             .sink { [weak self] _ in
+                let movieModels = self?.realmService.getAllWords().toArray()
+                self?.getMovieModelsRealmBaseSubject.send(movieModels ?? [])
+            }
+            .store(in: &cancellables)
+        
+        deleteRealmModelSubject
+            .sink { [weak self] movie in
+                self?.realmService.delete(movie: movie)
                 let movieModels = self?.realmService.getAllWords().toArray()
                 self?.getMovieModelsRealmBaseSubject.send(movieModels ?? [])
             }
