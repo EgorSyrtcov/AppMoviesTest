@@ -47,8 +47,8 @@ final class MainViewModelImpl: MainViewModel {
     private var popularMoviesTemp = [Movie]()
     private var upcomingMoviesTemp = [Movie]()
     private var genresTemp = [Genre]()
-    private var maxPopularPage = 1
-    private var maxUpcomingPage = 1
+    private var totalPopularPage = 1
+    private var totalUpcomingPage = 1
     private var currentPopularPage = 1
     private var currentUpcomingPage = 1
     
@@ -172,14 +172,14 @@ final class MainViewModelImpl: MainViewModel {
                 switch self.sectionSubject.value {
                 case .popular:
                     
-                    guard self.currentPopularPage >= self.maxPopularPage else { return }
-                    self.currentPopularPage+=1
+                    guard self.currentPopularPage <= self.totalPopularPage else { return }
+                    print(self.totalPopularPage)
                     
                     Task {
                         try? await self.requestMovies(page: self.currentPopularPage)
                     }
                 case .upcoming:
-                    guard self.currentUpcomingPage >= self.maxUpcomingPage else { return }
+                    guard self.currentUpcomingPage <= self.totalUpcomingPage else { return }
                     self.currentUpcomingPage+=1
                     
                     Task {
@@ -225,7 +225,7 @@ final class MainViewModelImpl: MainViewModel {
         }
         
         await MainActor.run { [weak self] in
-            self?.maxPopularPage = movie?.page ?? 1
+            self?.totalPopularPage = movie?.totalPages ?? 1
             self?.genresTemp = genre?.genres.compactMap { $0 } ?? []
             self?.popularMoviesTemp.append(contentsOf: movie?.movies ?? [])
             self?.popularMoviesSubject.send(popularMoviesTemp)
@@ -258,7 +258,7 @@ final class MainViewModelImpl: MainViewModel {
         }
         
         await MainActor.run { [weak self] in
-            self?.maxUpcomingPage = upcomingMovie?.page ?? 1
+            self?.totalUpcomingPage = upcomingMovie?.totalPages ?? 1
             self?.upcomingMoviesTemp.append(contentsOf: upcomingMovie?.movies ?? [])
             self?.upcomingMoviesSubject.send(upcomingMoviesTemp)
             isLoadingSubject.send(false)
