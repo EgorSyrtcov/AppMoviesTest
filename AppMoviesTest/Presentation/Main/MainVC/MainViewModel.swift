@@ -102,7 +102,7 @@ final class MainViewModelImpl: MainViewModel {
             }
             .eraseToAnyPublisher()
     }
-
+    
     private func filterMovies(_ movies: [Movie], forSearchText searchText: String?) -> [Movie] {
         guard let searchText = searchText, !searchText.isEmpty else {
             return movies
@@ -111,7 +111,7 @@ final class MainViewModelImpl: MainViewModel {
             return movie.title.lowercased().contains(searchText.lowercased())
         }
     }
-
+    
     var errorPublisher: AnyPublisher<(title: String?, subtitle: String?), Never> {
         errorSubject.eraseToAnyPublisher()
     }
@@ -146,18 +146,10 @@ final class MainViewModelImpl: MainViewModel {
                 
                 switch self.sectionSubject.value {
                 case .popular:
-                    self.currentPopularPage = 1
-                    self.popularMoviesTemp = []
-                    self.popularMoviesSubject.send([])
-                    
                     Task {
                         try? await self.requestMovies(page: self.currentPopularPage)
                     }
                 case .upcoming:
-                    self.currentUpcomingPage = 1
-                    self.upcomingMoviesTemp = []
-                    self.upcomingMoviesSubject.send([])
-                    
                     Task {
                         try? await self.requestUncomingMovies(page: self.currentUpcomingPage)
                     }
@@ -173,7 +165,7 @@ final class MainViewModelImpl: MainViewModel {
                 case .popular:
                     
                     guard self.currentPopularPage <= self.totalPopularPage else { return }
-                    print(self.totalPopularPage)
+                    self.currentPopularPage+=1
                     
                     Task {
                         try? await self.requestMovies(page: self.currentPopularPage)
@@ -227,8 +219,20 @@ final class MainViewModelImpl: MainViewModel {
         await MainActor.run { [weak self] in
             self?.totalPopularPage = movie?.totalPages ?? 1
             self?.genresTemp = genre?.genres.compactMap { $0 } ?? []
-            self?.popularMoviesTemp.append(contentsOf: movie?.movies ?? [])
-            self?.popularMoviesSubject.send(popularMoviesTemp)
+            
+            let newMovies = movie?.movies ?? []
+            if ((self?.popularMoviesTemp.filter { $0.id == newMovies.first?.id }.count ?? 0) != 0) {
+                isLoadingSubject.send(false)
+                return
+            }
+            
+            // вставляем элементы массива movies в массив popularMoviesTemp по индексу popularMoviesTemp.count
+           
+            if let movies = movie?.movies, self?.popularMoviesTemp != movies {
+                
+                self?.popularMoviesTemp.insert(contentsOf: movies, at: self?.popularMoviesTemp.count ?? 0)
+                self?.popularMoviesSubject.send(movies)
+            }
             isLoadingSubject.send(false)
         }
     }
@@ -259,8 +263,20 @@ final class MainViewModelImpl: MainViewModel {
         
         await MainActor.run { [weak self] in
             self?.totalUpcomingPage = upcomingMovie?.totalPages ?? 1
-            self?.upcomingMoviesTemp.append(contentsOf: upcomingMovie?.movies ?? [])
-            self?.upcomingMoviesSubject.send(upcomingMoviesTemp)
+            
+            // Check if 20 such elements have already been added
+            let newMovies = upcomingMovie?.movies ?? []
+            if ((self?.upcomingMoviesTemp.filter { $0.id == newMovies.first?.id }.count ?? 0) != 0) {
+                isLoadingSubject.send(false)
+                return
+            }
+            
+            // вставляем элементы массива movies в массив upcomingMoviesTemp по индексу upcomingMoviesTemp.count
+            if let movies = upcomingMovie?.movies {
+                self?.upcomingMoviesTemp.insert(contentsOf: movies, at: self?.upcomingMoviesTemp.count ?? 0)
+                self?.upcomingMoviesSubject.send(movies)
+            }
+
             isLoadingSubject.send(false)
         }
     }

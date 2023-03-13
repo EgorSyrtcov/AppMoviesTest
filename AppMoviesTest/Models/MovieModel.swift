@@ -14,7 +14,7 @@ struct MovieModel: Codable {
 }
 
 // MARK: - Result
-struct Movie: Codable {
+struct Movie: Codable, Hashable {
     let adult: Bool
     let backdropPath: String?
     let genreIDS: [Int]

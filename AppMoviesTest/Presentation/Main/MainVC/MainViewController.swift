@@ -91,10 +91,14 @@ final class MainViewController: UIViewController {
         viewModel.updatePopularMoviesPublisher
             .sink { [weak self] returnValue in
                 guard let self = self else { return }
-                self.popularMovies = returnValue
+                let currentCount = self.popularMovies.count
+                let newIndexPaths = (currentCount..<currentCount+returnValue.count).map { IndexPath(item: $0, section: 0) }
+                self.popularMovies.insert(contentsOf: returnValue, at: currentCount)
                 self.isLoadingMore = false
                 DispatchQueue.main.async {
-                    self.collectionView.reloadData()
+                    self.collectionView.performBatchUpdates({
+                        self.collectionView.insertItems(at: newIndexPaths)
+                    }, completion: nil)
                 }
             }
             .store(in: &cancellables)
@@ -102,11 +106,15 @@ final class MainViewController: UIViewController {
         viewModel.updateUncomingMoviesPublisher
             .sink { [weak self] returnValue in
                 guard let self = self else { return }
-                self.upcomingMovies = returnValue
+                let currentCount = self.upcomingMovies.count
+                let newIndexPaths = (currentCount..<currentCount+returnValue.count).map { IndexPath(item: $0, section: 0) }
+                self.upcomingMovies.insert(contentsOf: returnValue, at: currentCount)
                 self.isLoadingMore = false
                 
                 DispatchQueue.main.async {
-                    self.collectionView.reloadData()
+                    self.collectionView.performBatchUpdates({
+                        self.collectionView.insertItems(at: newIndexPaths)
+                    }, completion: nil)
                 }
             }
             .store(in: &cancellables)
